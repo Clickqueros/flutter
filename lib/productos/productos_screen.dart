@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:woocommerce_api/woocommerce_api.dart';
+import 'productos_int.dart';
 
 class ProductosScreen extends StatefulWidget {
   @override
@@ -41,7 +42,6 @@ class _ProductosScreenState extends State<ProductosScreen> {
     final sale = producto['sale_price'];
     final price = producto['price'];
 
-    // Si es variable y no hay regular/sale, usar price
     if ((regular == null || regular.isEmpty) && (sale == null || sale.isEmpty)) {
       return Text(
         '\$${price ?? 'Sin precio'}',
@@ -92,7 +92,6 @@ class _ProductosScreenState extends State<ProductosScreen> {
       appBar: AppBar(
         title: Text("Productos"),
         actions: [
-          // Botón de recarga manual de productos
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: obtenerProductos,
@@ -112,41 +111,46 @@ class _ProductosScreenState extends State<ProductosScreen> {
               ),
               itemBuilder: (context, index) {
                 var producto = productos[index];
-                return Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProductoDetalle(producto: producto),
+                    ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Imagen del producto
-                        Expanded(
-                          child: producto['images'] != null && producto['images'].isNotEmpty
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    producto['images'][0]['src'],
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                  ),
-                                )
-                              : Icon(Icons.image_not_supported, size: 60),
-                        ),
-                        SizedBox(height: 8),
-                        // Nombre del producto
-                        Text(
-                          producto['name'] ?? 'Sin nombre',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        SizedBox(height: 4),
-                        // Precio o rebaja
-                        _buildPrecio(producto),
-                      ],
+                  child: Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: producto['images'] != null && producto['images'].isNotEmpty
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      producto['images'][0]['src'],
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                    ),
+                                  )
+                                : Icon(Icons.image_not_supported, size: 60),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            producto['name'] ?? 'Sin nombre',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(height: 4),
+                          _buildPrecio(producto),
+                        ],
+                      ),
                     ),
                   ),
                 );
